@@ -31,10 +31,11 @@ mod errors;
 pub mod net;
 pub mod structs;
 
-pub use errors::Error;
+use std::io;
+pub use errors::{Error, ApiError};
 use net::{CjdnsNetSocket, CjdnsUdpSocket};
 pub use structs::decode;
-use structs::{CjdnsMsg, CjdnsMsgArgs, CjdnsPage};
+use structs::{CjdnsMsg, CjdnsMsgArgs, CjdnsPage, CjdnsResult};
 
 use rustc_serialize::Decodable;
 
@@ -67,6 +68,14 @@ impl Socket {
         Ok(msg)
     }
 
+    pub fn send_raw(&self, buf: Vec<u8>) -> Result<usize, io::Error> {
+        self.socket.send(buf.as_slice())
+    }
+
+    pub fn recv_raw(&self) -> Result<Vec<u8>, io::Error> {
+        self.socket.recv()
+    }
+
     /// Receive a paginated list from the api
     pub fn recv_all<T: Decodable>(&self, msg: &mut CjdnsMsg) -> Result<Vec<T>, Error> {
         let mut ctr = 0;
@@ -91,6 +100,12 @@ impl Socket {
         }
 
         Ok(pages)
+    }
+
+    pub fn recv_result<T: Decodable>(&self) -> Result<T, Error> where T: std::fmt::Debug {
+        let x: CjdnsResult<T> = self.recv()?;
+        let result = x.to_result()?;
+        Ok(result)
     }
 
     pub fn ping(&self) -> Result<structs::Pong, Error> {
@@ -127,6 +142,13 @@ impl Socket {
         let mut msg = CjdnsMsg::new("NodeStore_dumpTable");
         let objs = self.recv_all(&mut msg)?;
         Ok(objs)
+    }
+
+    pub fn nodestore_node_for_addr(&self) -> Result<structs::Node, Error> {
+        let msg = CjdnsMsg::new("NodeStore_nodeForAddr");
+        self.send(&msg)?;
+        let obj = self.recv_result()?;
+        Ok(obj)
     }
 }
 

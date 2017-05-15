@@ -3,7 +3,7 @@ use std::io;
 use rustc_serialize::Decodable;
 use bencode::{self, encode, Decoder};
 
-use errors::Error;
+use errors::{Error, ApiError};
 
 /// Decodes a bencoded Message
 ///
@@ -89,6 +89,27 @@ impl CjdnsPage {
     }
 }
 
+/// Translates api results to Result<_, _>
+#[derive(Debug, RustcDecodable)]
+pub struct CjdnsResult<T> {
+    pub error: String,
+    pub result: T,
+}
+
+impl<T> CjdnsResult<T> {
+    /// Convert to Result<_, _>
+    pub fn to_result(self) -> Result<T, ApiError> {
+        match self.error.as_ref() {
+            "none" => {
+                Ok(self.result)
+            },
+            _ => {
+                Err(ApiError::new(self.error))
+            },
+        }
+    }
+}
+
 #[derive(Debug, RustcDecodable)]
 pub struct Pong {
     pub q: String,
@@ -129,4 +150,32 @@ pub struct Route {
     pub bucket: u64,
     pub link: u64,
     pub time: u64,
+}
+
+#[allow(non_snake_case)]
+#[derive(Debug, RustcDecodable)]
+pub struct Node {
+    bestParent: Parent,
+    encodingScheme: Vec<EncodingScheme>,
+    cost: u64,
+    key: String,
+    linkCount: u64,
+    protocolVersion: u64,
+    routeLabel: String,
+}
+
+#[allow(non_snake_case)]
+#[derive(Debug, RustcDecodable)]
+pub struct EncodingScheme {
+    bitCount: u64,
+    prefix: String,
+    prefixLen: u64,
+}
+
+#[allow(non_snake_case)]
+#[derive(Debug, RustcDecodable)]
+pub struct Parent {
+    ip: String,
+    isOneHop: u64,
+    parentChildLabel: String,
 }

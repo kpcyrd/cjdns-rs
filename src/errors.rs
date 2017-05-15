@@ -7,6 +7,7 @@ pub enum Error {
     Io(io::Error),
     DecoderError(bencode::DecoderError),
     StreamingError(bencode::streaming::Error),
+    ApiError(ApiError),
 }
 
 impl From<io::Error> for Error {
@@ -24,5 +25,24 @@ impl From<bencode::DecoderError> for Error {
 impl From<bencode::streaming::Error> for Error {
     fn from(err: bencode::streaming::Error) -> Error {
         Error::StreamingError(err)
+    }
+}
+
+impl From<ApiError> for Error {
+    fn from(err: ApiError) -> Error {
+        Error::ApiError(err)
+    }
+}
+
+#[derive(Debug)]
+pub struct ApiError {
+    pub error: String,
+}
+
+impl ApiError {
+    pub fn new(err: String) -> ApiError {
+        ApiError {
+            error: err,
+        }
     }
 }
