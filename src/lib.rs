@@ -3,7 +3,7 @@
 
   # Example
 
-  ```
+  ```rust,ignore
   extern crate cjdns;
 
   use cjdns::structs::Peer;
