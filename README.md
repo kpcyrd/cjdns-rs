@@ -1,4 +1,4 @@
-# cjdns-rs [![Crates.io](https://img.shields.io/crates/v/cjdns.svg)](https://crates.io/crates/cjdns)
+# cjdns-rs [![Build Status](https://travis-ci.org/kpcyrd/cjdns-rs.svg?branch=master)](https://travis-ci.org/kpcyrd/cjdns-rs) [![Crates.io](https://img.shields.io/crates/v/cjdns.svg)](https://crates.io/crates/cjdns)
 
 Admin API implementation of cjdns
 
