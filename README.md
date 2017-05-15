@@ -4,7 +4,7 @@ Admin API implementation of cjdns
 
 ## Getting started
 
-```
+```rust
 extern crate cjdns;
 
 use cjdns::structs::Peer;
