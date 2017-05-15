@@ -1,4 +1,4 @@
-# cjdns-rs
+# cjdns-rs [![Crates.io](https://img.shields.io/crates/v/cjdns.svg)](https://crates.io/crates/cjdns)
 
 Admin API implementation of cjdns
 
