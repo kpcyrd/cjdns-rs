@@ -2,9 +2,14 @@
 name = "cjdns"
 version = "0.1.0"
 description = "Admin API implementation of cjdns"
+authors = ["kpcyrd <git@rxv.cc>"]
 license = "LGPL-3.0"
 repository = "https://github.com/kpcyrd/cjdns-rs"
-authors = ["kpcyrd <git@rxv.cc>"]
+categories = ["api-bindings"]
+readme = "README.md"
+
+[badges]
+travis-ci = { repository = "kpcyrd/cjdns-rs" }
 
 [dependencies]
 bencode = "0.1.16"
