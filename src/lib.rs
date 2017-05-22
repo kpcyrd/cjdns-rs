@@ -68,11 +68,11 @@ impl Socket {
         Ok(msg)
     }
 
-    pub fn send_raw(&self, buf: Vec<u8>) -> Result<usize, io::Error> {
+    pub fn send_raw(&self, buf: Vec<u8>) -> io::Result<usize> {
         self.socket.send(buf.as_slice())
     }
 
-    pub fn recv_raw(&self) -> Result<Vec<u8>, io::Error> {
+    pub fn recv_raw(&self) -> io::Result<Vec<u8>> {
         self.socket.recv()
     }
 

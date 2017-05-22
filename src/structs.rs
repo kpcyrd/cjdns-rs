@@ -55,7 +55,7 @@ impl CjdnsMsg {
         self.args = Some(args);
     }
 
-    pub fn encode(&self) -> Result<Vec<u8>, io::Error> {
+    pub fn encode(&self) -> io::Result<Vec<u8>> {
         encode(&self)
     }
 }

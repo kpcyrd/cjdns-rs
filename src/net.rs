@@ -3,8 +3,8 @@ use std::io;
 use std::net::UdpSocket;
 
 pub trait CjdnsNetSocket {
-    fn send(&self, buf: &[u8]) -> Result<usize, io::Error>;
-    fn recv(&self) -> Result<Vec<u8>, io::Error>;
+    fn send(&self, buf: &[u8]) -> io::Result<usize>;
+    fn recv(&self) -> io::Result<Vec<u8>>;
 }
 
 
@@ -14,7 +14,7 @@ pub struct CjdnsUdpSocket {
 }
 
 impl CjdnsUdpSocket {
-    pub fn new(addr: &str) -> Result<CjdnsUdpSocket, io::Error> {
+    pub fn new(addr: &str) -> io::Result<CjdnsUdpSocket> {
         let socket = UdpSocket::bind("127.0.0.1:43211")?;
         socket.connect(addr)?;
         Ok(CjdnsUdpSocket {
@@ -24,12 +24,12 @@ impl CjdnsUdpSocket {
 }
 
 impl CjdnsNetSocket for CjdnsUdpSocket {
-    fn send(&self, buf: &[u8]) -> Result<usize, io::Error> {
+    fn send(&self, buf: &[u8]) -> io::Result<usize> {
         let amt = self.socket.send(buf)?;
         Ok(amt)
     }
 
-    fn recv(&self) -> Result<Vec<u8>, io::Error> {
+    fn recv(&self) -> io::Result<Vec<u8>> {
         let mut buf = [0; 2048];
         let amt = self.socket.recv(&mut buf)?;
 
