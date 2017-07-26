@@ -1,12 +1,10 @@
 use std::io;
-
-use bencode;
+use serde_bencode;
 
 #[derive(Debug)]
 pub enum Error {
     Io(io::Error),
-    DecoderError(bencode::DecoderError),
-    StreamingError(bencode::streaming::Error),
+    BencodeError(serde_bencode::Error),
     ApiError(ApiError),
 }
 
@@ -16,15 +14,9 @@ impl From<io::Error> for Error {
     }
 }
 
-impl From<bencode::DecoderError> for Error {
-    fn from(err: bencode::DecoderError) -> Error {
-        Error::DecoderError(err)
-    }
-}
-
-impl From<bencode::streaming::Error> for Error {
-    fn from(err: bencode::streaming::Error) -> Error {
-        Error::StreamingError(err)
+impl From<serde_bencode::Error> for Error {
+    fn from(err: serde_bencode::Error) -> Error {
+        Error::BencodeError(err)
     }
 }
 

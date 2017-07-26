@@ -12,5 +12,6 @@ readme = "README.md"
 travis-ci = { repository = "kpcyrd/cjdns-rs" }
 
 [dependencies]
-bencode = "0.1.16"
-rustc-serialize = "0.3"
+serde = "1.0"
+serde_derive = "1.0"
+serde_bencode = "0.2"

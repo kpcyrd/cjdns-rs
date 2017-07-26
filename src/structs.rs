@@ -1,7 +1,6 @@
 //! Definition of various message types
-use std::io;
-use rustc_serialize::Decodable;
-use bencode::{self, encode, Decoder};
+use serde::de::DeserializeOwned;
+use serde_bencode::{ser, de};
 
 use errors::{Error, ApiError};
 
@@ -23,14 +22,12 @@ use errors::{Error, ApiError};
 /// let x: Pong = decode(bytes).unwrap();
 /// println!("{:?}", x);
 /// ```
-pub fn decode<A>(bytes: Vec<u8>) -> Result<A, Error> where A: Decodable {
-    let bencode: bencode::Bencode = bencode::from_vec(bytes)?;
-    let mut decoder = Decoder::new(&bencode);
-    let result: A = Decodable::decode(&mut decoder)?;
+pub fn decode<A>(bytes: Vec<u8>) -> Result<A, Error> where A: DeserializeOwned {
+    let result = de::from_bytes::<A>(&bytes)?;
     Ok(result)
 }
 
-#[derive(Debug, RustcEncodable)]
+#[derive(Debug, Serialize)]
 pub struct CjdnsMsg {
     pub q: String,
     pub args: Option<CjdnsMsgArgs>,
@@ -55,12 +52,13 @@ impl CjdnsMsg {
         self.args = Some(args);
     }
 
-    pub fn encode(&self) -> io::Result<Vec<u8>> {
-        encode(&self)
+    pub fn encode(&self) -> Result<Vec<u8>, Error> {
+        let result = ser::to_bytes(&self)?;
+        Ok(result)
     }
 }
 
-#[derive(Debug, RustcEncodable)]
+#[derive(Debug, Serialize)]
 pub struct CjdnsMsgArgs {
     pub page: Option<u64>,
 }
@@ -78,7 +76,7 @@ impl CjdnsMsgArgs {
     }
 }
 
-#[derive(Debug, RustcDecodable)]
+#[derive(Debug, Deserialize)]
 pub struct CjdnsPage {
     pub more: Option<u64>,
 }
@@ -90,7 +88,7 @@ impl CjdnsPage {
 }
 
 /// Translates api results to Result<_, _>
-#[derive(Debug, RustcDecodable)]
+#[derive(Debug, Deserialize)]
 pub struct CjdnsResult<T> {
     pub error: String,
     pub result: T,
@@ -110,18 +108,18 @@ impl<T> CjdnsResult<T> {
     }
 }
 
-#[derive(Debug, RustcDecodable)]
+#[derive(Debug, Deserialize)]
 pub struct Pong {
     pub q: String,
 }
 
-#[derive(Debug, RustcDecodable)]
+#[derive(Debug, Deserialize)]
 pub struct PeerStats {
     pub peers: Vec<Peer>,
 }
 
 #[allow(non_snake_case)]
-#[derive(Debug, RustcDecodable)]
+#[derive(Debug, Deserialize)]
 pub struct Peer {
     pub addr: String,
     pub bytesIn: u64,
@@ -138,13 +136,13 @@ pub struct Peer {
 }
 
 #[allow(non_snake_case)]
-#[derive(Debug, RustcDecodable)]
+#[derive(Debug, Deserialize)]
 pub struct NodeStore {
     pub routingTable: Vec<Route>,
 }
 
 #[allow(non_snake_case)]
-#[derive(Debug, RustcDecodable)]
+#[derive(Debug, Deserialize)]
 pub struct Route {
     pub addr: String,
     pub bucket: u64,
@@ -153,7 +151,7 @@ pub struct Route {
 }
 
 #[allow(non_snake_case)]
-#[derive(Debug, RustcDecodable)]
+#[derive(Debug, Deserialize)]
 pub struct Node {
     bestParent: Parent,
     encodingScheme: Vec<EncodingScheme>,
@@ -165,7 +163,7 @@ pub struct Node {
 }
 
 #[allow(non_snake_case)]
-#[derive(Debug, RustcDecodable)]
+#[derive(Debug, Deserialize)]
 pub struct EncodingScheme {
     bitCount: u64,
     prefix: String,
@@ -173,7 +171,7 @@ pub struct EncodingScheme {
 }
 
 #[allow(non_snake_case)]
-#[derive(Debug, RustcDecodable)]
+#[derive(Debug, Deserialize)]
 pub struct Parent {
     ip: String,
     isOneHop: u64,

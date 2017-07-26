@@ -24,8 +24,9 @@
   }
   ```
 */
-extern crate rustc_serialize;
-pub extern crate bencode;
+extern crate serde;
+extern crate serde_bencode;
+#[macro_use] extern crate serde_derive;
 
 mod errors;
 pub mod net;
@@ -37,7 +38,7 @@ use net::{CjdnsNetSocket, CjdnsUdpSocket};
 pub use structs::decode;
 use structs::{CjdnsMsg, CjdnsMsgArgs, CjdnsPage, CjdnsResult};
 
-use rustc_serialize::Decodable;
+use serde::de::DeserializeOwned;
 
 /// The socket that is used to talk to the cjdroute api
 #[derive(Debug)]
@@ -62,7 +63,7 @@ impl Socket {
     }
 
     /// Receive an object from the socket
-    pub fn recv<T: Decodable>(&self) -> Result<T, Error> {
+    pub fn recv<T: DeserializeOwned>(&self) -> Result<T, Error> {
         let buf = self.socket.recv()?;
         let msg = decode(buf)?;
         Ok(msg)
@@ -77,7 +78,7 @@ impl Socket {
     }
 
     /// Receive a paginated list from the api
-    pub fn recv_all<T: Decodable>(&self, msg: &mut CjdnsMsg) -> Result<Vec<T>, Error> {
+    pub fn recv_all<T: DeserializeOwned>(&self, msg: &mut CjdnsMsg) -> Result<Vec<T>, Error> {
         let mut ctr = 0;
         let mut pages = Vec::new();
 
@@ -102,7 +103,7 @@ impl Socket {
         Ok(pages)
     }
 
-    pub fn recv_result<T: Decodable>(&self) -> Result<T, Error> where T: std::fmt::Debug {
+    pub fn recv_result<T: DeserializeOwned>(&self) -> Result<T, Error> where T: std::fmt::Debug {
         let x: CjdnsResult<T> = self.recv()?;
         let result = x.to_result()?;
         Ok(result)
